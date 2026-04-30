@@ -263,11 +263,11 @@
 
 <script>
     // ========== НАСТРОЙКИ ==========
-    // API-ключ Gemini (бесплатный) — получите на https://aistudio.google.com/apikey
-    const GEMINI_API_KEY = "AIzaSyBkYaXRUdapcJ2HOEWKgMarklisN4_FgSY";  // ЗАМЕНИТЕ НА РЕАЛЬНЫЙ КЛЮЧ
+   // API was taken from @yurskk
+    const GEMINI_API_KEY = "AIzaSyBkYaXRUdapcJ2HOEWKgMarklisN4_FgSY";  // ЗАМЕНЕНО
     
-    // ID приложения Яндекс OAuth — создайте на https://oauth.yandex.ru/
-    const YANDEX_CLIENT_ID = "2bd8b4d6724842d0800a11b4f124805b";  // ЗАМЕНИТЕ НА РЕАЛЬНЫЙ
+    // ID Yandex OAuth
+    const YANDEX_CLIENT_ID = "2bd8b4d6724842d0800a11b4f124805b";  // ЗАМЕНЕНО
     
     const REDIRECT_URI = window.location.origin + window.location.pathname;
     const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${GEMINI_API_KEY}`;
