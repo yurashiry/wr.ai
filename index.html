@@ -1,3 +1,4 @@
+Numai în limba rusă🇷🇺🇷🇸🇧🇾🇲🇩, [30.04.2026 21:07]
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -148,7 +149,8 @@
             transition: 0.2s;
         }
 
-        .send-action:hover:not(:disabled) {
+Numai în limba rusă🇷🇺🇷🇸🇧🇾🇲🇩, [30.04.2026 21:07]
+.send-action:hover:not(:disabled) {
             transform: scale(0.96);
             background: linear-gradient(95deg, #1a6e2a, #2bbf4a);
             box-shadow: 0 0 12px #47ff6e;
@@ -170,57 +172,12 @@
             color: #b5ffc2;
             font-weight: 600;
             margin-bottom: 14px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .copy-code-btn {
-            background: #1e4a2a;
-            border: 1px solid #4eff70;
-            border-radius: 40px;
-            padding: 6px 16px;
-            color: #abffb5;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .copy-code-btn:hover {
-            background: #2a6a3a;
-            box-shadow: 0 0 8px #47ff6e;
         }
 
         .resp-content {
             color: #e9ffe7;
             line-height: 1.5;
             white-space: pre-wrap;
-        }
-
-        /* Стили для кода внутри ответа */
-        .resp-content pre {
-            background: #0a1a0e;
-            border-radius: 16px;
-            padding: 16px;
-            overflow-x: auto;
-            margin: 12px 0;
-            border: 1px solid #2c8a3a;
-            position: relative;
-        }
-
-        .resp-content code {
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            color: #b5ffc2;
-        }
-
-        .resp-content pre code {
-            display: block;
         }
 
         .loader {
@@ -275,27 +232,6 @@
             color: #5aa86a;
             border-top: 1px solid #2d6e3a;
         }
-
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e4a2a;
-            color: #d4ffdb;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            z-index: 1000;
-            animation: fadeOut 2s ease forwards;
-            pointer-events: none;
-        }
-
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            70% { opacity: 1; }
-            100% { opacity: 0; visibility: hidden; }
-        }
     </style>
 </head>
 <body>
@@ -304,87 +240,38 @@
     <div class="header">
         <div>
             <span class="logo">WR AI</span>
-            <span class="badge">✦ with Alice AI ✦</span>
+            <span class="badge">✦ YandexGPT ✦</span>
         </div>
         <div id="userWidget"></div>
     </div>
     <div id="dynamicContent"></div>
-    <footer>🌿 переливающаяся магия WR AI с технологиями от WR. Поддеживаются все языки мира.</footer>
+    <footer>🌿 переливающаяся магия WR AI на YandexGPT</footer>
 </div>
 
 <script>
     // ========== ВСТАВЬТЕ ВАШИ ДАННЫЕ ==========
+    // 1. API-ключ YandexGPT: https://cloud.yandex.ru → Сервисные аккаунты → Создать API-ключ
     const YANDEXGPT_API_KEY = "AQVN1m5nxXDEmUp39l1J7uKMFWCU-9lSZ_7TqAhd";
+    
+    // 2. Folder ID: https://cloud.yandex.ru → на главной странице справа сверху
     const YANDEXGPT_FOLDER_ID = "b1g2s26j7ptcmn6c2u66";
+    
+    // 3. Client ID: https://oauth.yandex.ru → Зарегистрировать приложение
     const YANDEX_CLIENT_ID = "b8f23d01e8594c39b7deac22c9f67b84";
     // ========================================
     
     const REDIRECT_URI = window.location.origin + window.location.pathname;
-    const YANDEXGPT_URL = "https://ai.api.cloud.yandex.net/v1";
+    const YANDEXGPT_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion";
     
     let loggedUser = null;
     
     const userWidget = document.getElementById('userWidget');
     const dynamicDiv = document.getElementById('dynamicContent');
     
-    // Показать уведомление
-    function showToast(message) {
-        const existing = document.querySelector('.toast');
-        if (existing) existing.remove();
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.textContent = message;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2000);
-    }
-    
-    // Обработка кода в ответе и добавление кнопки копирования
-    function formatResponseWithCopyButtons(text) {
-        // Ищем блоки кода ```язык\nкод\n```
-        const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
-        let lastIndex = 0;
-        let result = '';
-        let match;
-        
-        while ((match = codeBlockRegex.exec(text)) !== null) {
-            result += escapeHtml(text.substring(lastIndex, match.index));
-            const code = match[2];
-            const language = match[1] || 'code';
-            const blockId = 'code_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
-            
-            result += `
-                <div style="position: relative; margin: 12px 0;">
-                    <pre><code class="language-${language}" id="${blockId}">${escapeHtml(code)}</code></pre>
-                    <button class="copy-code-btn" style="position: absolute; top: 8px; right: 8px;" onclick="copyCode('${blockId}')">📋 Копировать</button>
-                </div>
-            `;
-            lastIndex = match.index + match[0].length;
-        }
-        result += escapeHtml(text.substring(lastIndex));
-        
-        // Обрабатываем строчные коды `code`
-        result = result.replace(/`([^`]+)`/g, '<code style="background:#0a1a0e; padding:2px 6px; border-radius:8px;">$1</code>');
-        
-        return result;
-    }
-    
-    // Функция копирования (глобальная для вызова из onclick)
-    window.copyCode = function(blockId) {
-        const codeElement = document.getElementById(blockId);
-        if (codeElement) {
-            const code = codeElement.textContent;
-            navigator.clipboard.writeText(code).then(() => {
-                showToast('✅ Код скопирован!');
-            }).catch(() => {
-                showToast('❌ Не удалось скопировать');
-            });
-        }
-    };
-    
     // Запрос к YandexGPT
     async function askYandexGPT(query) {
         const requestBody = {
-            modelUri: `gpt://${YANDEXGPT_FOLDER_ID}/yandexgpt-lite`,
+            modelUri: gpt://${YANDEXGPT_FOLDER_ID}/yandexgpt-lite,
             completionOptions: { temperature: 0.7, maxTokens: 2000 },
             messages: [{ role: "user", text: query }]
         };
@@ -392,38 +279,21 @@
         const response = await fetch(YANDEXGPT_URL, {
             method: "POST",
             headers: {
-                "Authorization": `Api-Key ${YANDEXGPT_API_KEY}`,
+                "Authorization": Api-Key ${YANDEXGPT_API_KEY},
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(requestBody)
-        });
+
+Numai în limba rusă🇷🇺🇷🇸🇧🇾🇲🇩, [30.04.2026 21:07]
+});
         
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`Ошибка ${response.status}: ${errorText.slice(0, 150)}`);
+            throw new Error(Ошибка ${response.status}: ${errorText.slice(0, 150)});
         }
         
         const data = await response.json();
         return data.result.alternatives[0].message.text;
-    }
-    
-    // Сохранение/загрузка пользователя из localStorage
-    function saveUserToStorage(user) {
-        localStorage.setItem('wr_ai_user', JSON.stringify(user));
-    }
-    
-    function loadUserFromStorage() {
-        const saved = localStorage.getItem('wr_ai_user');
-        if (saved) {
-            try {
-                return JSON.parse(saved);
-            } catch(e) { return null; }
-        }
-        return null;
-    }
-    
-    function clearUserStorage() {
-        localStorage.removeItem('wr_ai_user');
     }
     
     // Вход через Яндекс
@@ -434,72 +304,52 @@
         
         if (token) {
             fetch('https://login.yandex.ru/info?format=json', {
-                headers: { 'Authorization': `OAuth ${token}` }
+                headers: { 'Authorization': OAuth ${token} }
             })
             .then(res => res.json())
             .then(data => {
                 if (data.id) {
                     loggedUser = {
-                        id: data.id,
                         name: data.real_name || data.login,
                         avatar: data.default_avatar_id ? 
-                            `https://avatars.yandex.net/get-yapic/${data.default_avatar_id}/islands-200` : 
-                            `https://ui-avatars.com/api/?background=2d6a4f&color=fff&name=${data.login[0]}`
+                            https://avatars.yandex.net/get-yapic/${data.default_avatar_id}/islands-200 : 
+                            https://ui-avatars.com/api/?background=2d6a4f&color=fff&name=${data.login[0]}
                     };
-                    saveUserToStorage(loggedUser);
                     window.location.hash = '';
                     updateUI();
                 }
             });
-        } else {
-            // Проверяем сохранённого пользователя
-            const savedUser = loadUserFromStorage();
-            if (savedUser) {
-                loggedUser = savedUser;
-                updateUI();
-            } else {
-                updateUI();
-            }
         }
     }
     
     function startLogin() {
-        const url = `https://oauth.yandex.ru/authorize?response_type=token&client_id=${YANDEX_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
+        const url = https://oauth.yandex.ru/authorize?response_type=token&client_id=${YANDEX_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)};
         window.location.href = url;
     }
     
-    function logout() {
-        loggedUser = null;
-        clearUserStorage();
-        updateUI();
-        showToast('👋 Вы вышли из системы');
-    }
-    
     function renderLogin() {
-        dynamicDiv.innerHTML = `
+        dynamicDiv.innerHTML = 
             <div class="login-box">
                 <button class="yandex-btn" id="loginBtn">🔑 Войти через Яндекс ID</button>
                 <p style="color: #a0e0a8; margin-top: 24px;">Авторизуйтесь, чтобы общаться с WR AI</p>
             </div>
-        `;
+        ;
         document.getElementById('loginBtn')?.addEventListener('click', startLogin);
     }
     
     function renderChat() {
-        dynamicDiv.innerHTML = `
+        dynamicDiv.innerHTML = 
             <div class="chat-area">
                 <div class="input-group">
                     <input type="text" class="prompt-field" id="prompt" placeholder="Спросите WR AI о чём угодно... 💚">
                     <button class="send-action" id="sendBtn">✨ Отправить</button>
                 </div>
                 <div class="response-block">
-                    <div class="resp-title">
-                        <span>🌱 WR AI отвечает</span>
-                    </div>
+                    <div class="resp-title">🌱 WR AI отвечает</div>
                     <div class="resp-content" id="answer">✨ Здесь будет ответ...</div>
                 </div>
             </div>
-        `;
+        ;
         
         const input = document.getElementById('prompt');
         const btn = document.getElementById('sendBtn');
@@ -510,15 +360,14 @@
             if (!query) return;
             
             btn.disabled = true;
-            answerDiv.innerHTML = `<div class="loader"><div class="spinner"></div> WR AI думает...</div>`;
+            answerDiv.innerHTML = <div class="loader"><div class="spinner"></div> WR AI думает...</div>;
             
             try {
                 const reply = await askYandexGPT(query);
-                const formattedReply = formatResponseWithCopyButtons(reply);
-                answerDiv.innerHTML = formattedReply;
+                answerDiv.innerHTML = escapeHtml(reply);
                 input.value = '';
             } catch (err) {
-                answerDiv.innerHTML = `<span style="color:#ffb59e;">⚠️ Ошибка: ${escapeHtml(err.message)}</span>`;
+                answerDiv.innerHTML = <span style="color:#ffb59e;">⚠️ Ошибка: ${escapeHtml(err.message)}</span>;
             } finally {
                 btn.disabled = false;
                 input.focus();
@@ -535,17 +384,22 @@
             userWidget.innerHTML = '';
             renderLogin();
             return;
-        }
+
+Numai în limba rusă🇷🇺🇷🇸🇧🇾🇲🇩, [30.04.2026 21:07]
+}
         
-        userWidget.innerHTML = `
+        userWidget.innerHTML = 
             <div class="user-panel">
                 <img class="avatar" src="${loggedUser.avatar}" onerror="this.src='https://ui-avatars.com/api/?background=2e6b3e&color=fff&name=${loggedUser.name[0]}'">
                 <span class="user-name">${escapeHtml(loggedUser.name)}</span>
                 <button class="logout-btn" id="logoutBtn">🚪</button>
             </div>
-        `;
+        ;
         renderChat();
-        document.getElementById('logoutBtn')?.addEventListener('click', logout);
+        document.getElementById('logoutBtn')?.addEventListener('click', () => {
+            loggedUser = null;
+            updateUI();
+        });
     }
     
     function escapeHtml(str) {
@@ -553,8 +407,8 @@
         return str.replace(/[&<>]/g, (m) => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
     }
     
-    // Запуск
     checkYandexAuth();
+    updateUI();
 </script>
 </body>
 </html>
