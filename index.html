@@ -320,7 +320,7 @@
         dynamicDiv.innerHTML = `
             <div class="login-box">
                 <button class="yandex-btn" id="loginBtn">🔑 Войти через Яндекс ID</button>
-                <p style="color: #a0e0a8; margin-top: 24px;">Авторизуйтесь, чтобы общаться с WR AI</p>
+                <p style="color: #a0e0a8; margin-top: 24px;">Авторизуйтесь, чтобы общаться с WR AI. Это сделано ради вашей безопасности.</p>
             </div>
         `;
         document.getElementById('loginBtn')?.addEventListener('click', startLogin);
@@ -358,7 +358,7 @@
             } catch (err) {
                 let errorMsg = err.message;
                 if (errorMsg.includes('403')) {
-                    errorMsg = 'Ошибка авторизации. Сервер WR AI не отвечает, ошибка 429.';
+                    errorMsg = 'Ошибка авторизации. Сервер WR AI не отвечает, ошибка 403.';
                 } else if (errorMsg.includes('429')) {
                     errorMsg = 'Превышен лимит запросов. Попробуйте через минуту.';
                 } else if (errorMsg.includes('fetch')) {
