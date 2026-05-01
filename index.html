@@ -1,10 +1,9 @@
-Numai în limba rusă🇷🇺🇷🇸🇧🇾🇲🇩, [30.04.2026 21:07]
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WR AI — YandexGPT</title>
+    <title>WR AI — DeepSeek нейросеть</title>
     <style>
         * {
             margin: 0;
@@ -149,8 +148,7 @@ Numai în limba rusă🇷🇺🇷🇸🇧🇾🇲🇩, [30.04.2026 21:07]
             transition: 0.2s;
         }
 
-Numai în limba rusă🇷🇺🇷🇸🇧🇾🇲🇩, [30.04.2026 21:07]
-.send-action:hover:not(:disabled) {
+        .send-action:hover:not(:disabled) {
             transform: scale(0.96);
             background: linear-gradient(95deg, #1a6e2a, #2bbf4a);
             box-shadow: 0 0 12px #47ff6e;
@@ -240,60 +238,53 @@ Numai în limba rusă🇷🇺🇷🇸🇧🇾🇲🇩, [30.04.2026 21:07]
     <div class="header">
         <div>
             <span class="logo">WR AI</span>
-            <span class="badge">✦ YandexGPT ✦</span>
+            <span class="badge">✦ with WR AI ✦</span>
         </div>
         <div id="userWidget"></div>
     </div>
     <div id="dynamicContent"></div>
-    <footer>🌿 переливающаяся магия WR AI на YandexGPT</footer>
+    <footer>🌿 переливающаяся магия WR AI с технологиями от WR</footer>
 </div>
 
 <script>
     // ========== ВСТАВЬТЕ ВАШИ ДАННЫЕ ==========
-    // 1. API-ключ YandexGPT: https://cloud.yandex.ru → Сервисные аккаунты → Создать API-ключ
-    const YANDEXGPT_API_KEY = "AQVN1m5nxXDEmUp39l1J7uKMFWCU-9lSZ_7TqAhd";
+    // 1. API-ключ DeepSeek: https://platform.deepseek.com → API Keys
+    const DEEPSEEK_API_KEY = "sk-1bb8c2a0caa7451ab8e81f7ac5b8ff72";
     
-    // 2. Folder ID: https://cloud.yandex.ru → на главной странице справа сверху
-    const YANDEXGPT_FOLDER_ID = "b1g2s26j7ptcmn6c2u66";
-    
-    // 3. Client ID: https://oauth.yandex.ru → Зарегистрировать приложение
+    // 2. Client ID от Яндекса: https://oauth.yandex.ru → Зарегистрировать приложение
     const YANDEX_CLIENT_ID = "b8f23d01e8594c39b7deac22c9f67b84";
     // ========================================
     
     const REDIRECT_URI = window.location.origin + window.location.pathname;
-    const YANDEXGPT_URL = "https://llm.api.cloud.yandex.net/foundationModels/v1/completion";
+    const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
     
     let loggedUser = null;
     
     const userWidget = document.getElementById('userWidget');
     const dynamicDiv = document.getElementById('dynamicContent');
     
-    // Запрос к YandexGPT
-    async function askYandexGPT(query) {
-        const requestBody = {
-            modelUri: gpt://${YANDEXGPT_FOLDER_ID}/yandexgpt-lite,
-            completionOptions: { temperature: 0.7, maxTokens: 2000 },
-            messages: [{ role: "user", text: query }]
-        };
-        
-        const response = await fetch(YANDEXGPT_URL, {
+    // Запрос к DeepSeek
+    async function askDeepSeek(query) {
+        const response = await fetch(DEEPSEEK_URL, {
             method: "POST",
             headers: {
-                "Authorization": Api-Key ${YANDEXGPT_API_KEY},
+                "Authorization": `Bearer ${DEEPSEEK_API_KEY}`,
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(requestBody)
-
-Numai în limba rusă🇷🇺🇷🇸🇧🇾🇲🇩, [30.04.2026 21:07]
-});
+            body: JSON.stringify({
+                model: "deepseek-chat",
+                messages: [{ role: "user", content: query }],
+                temperature: 0.7
+            })
+        });
         
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(Ошибка ${response.status}: ${errorText.slice(0, 150)});
+            throw new Error(`Ошибка ${response.status}: ${errorText.slice(0, 150)}`);
         }
         
         const data = await response.json();
-        return data.result.alternatives[0].message.text;
+        return data.choices[0].message.content;
     }
     
     // Вход через Яндекс
@@ -304,7 +295,7 @@ Numai în limba rusă🇷🇺🇷🇸🇧🇾🇲🇩, [30.04.2026 21:07]
         
         if (token) {
             fetch('https://login.yandex.ru/info?format=json', {
-                headers: { 'Authorization': OAuth ${token} }
+                headers: { 'Authorization': `OAuth ${token}` }
             })
             .then(res => res.json())
             .then(data => {
@@ -312,33 +303,34 @@ Numai în limba rusă🇷🇺🇷🇸🇧🇾🇲🇩, [30.04.2026 21:07]
                     loggedUser = {
                         name: data.real_name || data.login,
                         avatar: data.default_avatar_id ? 
-                            https://avatars.yandex.net/get-yapic/${data.default_avatar_id}/islands-200 : 
-                            https://ui-avatars.com/api/?background=2d6a4f&color=fff&name=${data.login[0]}
+                            `https://avatars.yandex.net/get-yapic/${data.default_avatar_id}/islands-200` : 
+                            `https://ui-avatars.com/api/?background=2d6a4f&color=fff&name=${data.login[0]}`
                     };
                     window.location.hash = '';
                     updateUI();
                 }
-            });
+            })
+            .catch(err => console.error('Ошибка получения данных:', err));
         }
     }
     
     function startLogin() {
-        const url = https://oauth.yandex.ru/authorize?response_type=token&client_id=${YANDEX_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)};
+        const url = `https://oauth.yandex.ru/authorize?response_type=token&client_id=${YANDEX_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`;
         window.location.href = url;
     }
     
     function renderLogin() {
-        dynamicDiv.innerHTML = 
+        dynamicDiv.innerHTML = `
             <div class="login-box">
                 <button class="yandex-btn" id="loginBtn">🔑 Войти через Яндекс ID</button>
-                <p style="color: #a0e0a8; margin-top: 24px;">Авторизуйтесь, чтобы общаться с WR AI</p>
+                <p style="color: #a0e0a8; margin-top: 24px;">Авторизуйтесь, чтобы общаться с WR AI. Это сделано ради вашей безопасности.</p>
             </div>
-        ;
+        `;
         document.getElementById('loginBtn')?.addEventListener('click', startLogin);
     }
     
     function renderChat() {
-        dynamicDiv.innerHTML = 
+        dynamicDiv.innerHTML = `
             <div class="chat-area">
                 <div class="input-group">
                     <input type="text" class="prompt-field" id="prompt" placeholder="Спросите WR AI о чём угодно... 💚">
@@ -349,7 +341,7 @@ Numai în limba rusă🇷🇺🇷🇸🇧🇾🇲🇩, [30.04.2026 21:07]
                     <div class="resp-content" id="answer">✨ Здесь будет ответ...</div>
                 </div>
             </div>
-        ;
+        `;
         
         const input = document.getElementById('prompt');
         const btn = document.getElementById('sendBtn');
@@ -360,14 +352,20 @@ Numai în limba rusă🇷🇺🇷🇸🇧🇾🇲🇩, [30.04.2026 21:07]
             if (!query) return;
             
             btn.disabled = true;
-            answerDiv.innerHTML = <div class="loader"><div class="spinner"></div> WR AI думает...</div>;
+            answerDiv.innerHTML = `<div class="loader"><div class="spinner"></div> WR AI думает...</div>`;
             
             try {
-                const reply = await askYandexGPT(query);
+                const reply = await askDeepSeek(query);
                 answerDiv.innerHTML = escapeHtml(reply);
                 input.value = '';
             } catch (err) {
-                answerDiv.innerHTML = <span style="color:#ffb59e;">⚠️ Ошибка: ${escapeHtml(err.message)}</span>;
+                let errorMsg = err.message;
+                if (errorMsg.includes('402')) {
+                    errorMsg = 'Не хватает баланса DeepSeek. Зарегистрируйте новый аккаунт — дают $5 бонуса.';
+                } else if (errorMsg.includes('401')) {
+                    errorMsg = 'Неверный API-ключ DeepSeek. Проверьте и вставьте заново.';
+                }
+                answerDiv.innerHTML = `<span style="color:#ffb59e;">⚠️ ${escapeHtml(errorMsg)}</span>`;
             } finally {
                 btn.disabled = false;
                 input.focus();
@@ -384,17 +382,15 @@ Numai în limba rusă🇷🇺🇷🇸🇧🇾🇲🇩, [30.04.2026 21:07]
             userWidget.innerHTML = '';
             renderLogin();
             return;
-
-Numai în limba rusă🇷🇺🇷🇸🇧🇾🇲🇩, [30.04.2026 21:07]
-}
+        }
         
-        userWidget.innerHTML = 
+        userWidget.innerHTML = `
             <div class="user-panel">
                 <img class="avatar" src="${loggedUser.avatar}" onerror="this.src='https://ui-avatars.com/api/?background=2e6b3e&color=fff&name=${loggedUser.name[0]}'">
                 <span class="user-name">${escapeHtml(loggedUser.name)}</span>
                 <button class="logout-btn" id="logoutBtn">🚪</button>
             </div>
-        ;
+        `;
         renderChat();
         document.getElementById('logoutBtn')?.addEventListener('click', () => {
             loggedUser = null;
