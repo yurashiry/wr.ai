@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WR AI — Работает без VPN</title>
+    <title>WR AI </title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -114,14 +114,26 @@
         .spinner { width: 20px; height: 20px; border: 2px solid #307a3a; border-top: 2px solid #8eff9a; border-radius: 50%; animation: spin 0.7s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .login-box { padding: 60px 30px; text-align: center; }
-        .yandex-btn { display: inline-flex; align-items: center; gap: 12px; background: #1a3a1e; border: 1.5px solid #4eff70; border-radius: 60px; padding: 14px 32px; font-size: 1.1rem; font-weight: 600; color: #d4ffdb; cursor: pointer; }
+        .yandex-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: #1a3a1e;
+            border: 1.5px solid #4eff70;
+            border-radius: 60px;
+            padding: 14px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #d4ffdb;
+            cursor: pointer;
+        }
         footer { text-align: center; padding: 18px; font-size: 0.7rem; color: #5aa86a; border-top: 1px solid #2d6e3a; }
     </style>
 </head>
 <body>
 <div class="glass">
     <div class="header">
-        <div><span class="logo">WR AI</span><span class="version">✦ ВЕРСИЯ 9.14 ✦</span></div>
+        <div><span class="logo">WR AI</span><span class="version">✦ ВЕРСИЯ 9.15 ✦</span></div>
         <div id="userWidget"></div>
     </div>
     <div id="dynamicContent"></div>
@@ -131,9 +143,7 @@
 <script>
     const YANDEX_CLIENT_ID = "b8f23d01e8594c39b7deac22c9f67b84";
     const REDIRECT_URI = window.location.origin + window.location.pathname;
-    
-    // ✅ ВАШ URL ОБЛАЧНОЙ ФУНКЦИИ (уже вставлен)
-    const PROXY_URL = "https://functions.yandexcloud.net/d4efri8m9moigj975ocm";
+    const PROXY_URL = "https://functions.yandexcloud.net/d4efri8m9moigj9750cm";
     
     let loggedUser = null;
     
@@ -144,9 +154,13 @@
         const response = await fetch(PROXY_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query })
+            body: JSON.stringify({ query: query })
         });
-        if (!response.ok) throw new Error(`Ошибка ${response.status}`);
+        
+        if (!response.ok) {
+            throw new Error(`Ошибка HTTP ${response.status}`);
+        }
+        
         const data = await response.json();
         if (data.error) throw new Error(data.error);
         return data.reply;
@@ -182,7 +196,7 @@
     }
     
     function renderLogin() {
-        dynamicDiv.innerHTML = `<div class="login-box"><button class="yandex-btn" id="loginBtn">🔑 Войти через Яндекс ID</button><p style="color:#a0e0a8;margin-top:24px;">Авторизуйтесь</p></div>`;
+        dynamicDiv.innerHTML = `<div class="login-box"><button class="yandex-btn" id="loginBtn">🔑 Войти через Яндекс ID</button><p style="color:#a0e0a8;margin-top:24px;">Авторизуйтесь. Это сделано ради ваше безопасности.</p></div>`;
         document.getElementById('loginBtn')?.addEventListener('click', startLogin);
     }
     
