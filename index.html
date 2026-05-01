@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WR AI — DeepSeek нейросеть</title>
+    <title>WR AI</title>
     <style>
         * {
             margin: 0;
@@ -238,48 +238,96 @@
     <div class="header">
         <div>
             <span class="logo">WR AI</span>
-            <span class="badge">✦ with WR AI ✦</span>
+            <span class="badge">✦ Версия 5.14 ✦</span>
         </div>
         <div id="userWidget"></div>
     </div>
     <div id="dynamicContent"></div>
-    <footer>🌿 переливающаяся магия WR AI с технологиями от WR</footer>
+    <footer>🌿 переливающаяся магия WR AI</footer>
 </div>
 
 <script>
-    // ========== ВСТАВЬТЕ ВАШИ ДАННЫЕ ==========
-    // 1. API-ключ DeepSeek: https://platform.deepseek.com → API Keys
-    const DEEPSEEK_API_KEY = "sk-1bb8c2a0caa7451ab8e81f7ac5b8ff72";
+    // ========== НАСТРОЙКИ GigaChat ==========
+    // 1. API-ключ GigaChat: https://developers.sber.ru -> Создать проект -> Получить ключ
+    const GIGACHAT_AUTH_KEY = "MDE5ZGUyODUtOTllMS03NmI4LWI0YzUtNzUxZTU4OGM4MWRjOjQ1MjgyZWM3LTEyNTctNDAyNy1iYTBhLWU0M2Y1MzYyN2U3ZQ==";
     
-    // 2. Client ID от Яндекса: https://oauth.yandex.ru → Зарегистрировать приложение
+    // 2. Client ID от Яндекса: https://oauth.yandex.ru -> Зарегистрировать приложение
     const YANDEX_CLIENT_ID = "b8f23d01e8594c39b7deac22c9f67b84";
     // ========================================
     
     const REDIRECT_URI = window.location.origin + window.location.pathname;
-    const DEEPSEEK_URL = "https://api.deepseek.com/v1/chat/completions";
+    
+    // Эндпоинты GigaChat API [citation:3][citation:6]
+    const GIGACHAT_TOKEN_URL = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth";
+    const GIGACHAT_API_URL = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions";
     
     let loggedUser = null;
+    let gigaAccessToken = null;
+    let tokenExpiresAt = null;
     
     const userWidget = document.getElementById('userWidget');
     const dynamicDiv = document.getElementById('dynamicContent');
     
-    // Запрос к DeepSeek
-    async function askDeepSeek(query) {
-        const response = await fetch(DEEPSEEK_URL, {
+    // Получение access_token GigaChat
+    async function getGigaToken() {
+        const response = await fetch(GIGACHAT_TOKEN_URL, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${DEEPSEEK_API_KEY}`,
-                "Content-Type": "application/json"
+                "Authorization": `Bearer ${GIGACHAT_AUTH_KEY}`,
+                "Content-Type": "application/x-www-form-urlencoded",
+                "RqUID": crypto.randomUUID()
             },
-            body: JSON.stringify({
-                model: "deepseek-chat",
-                messages: [{ role: "user", content: query }],
-                temperature: 0.7
-            })
+            body: "scope=GIGACHAT_API_PERS"  // для физических лиц [citation:3][citation:5]
         });
         
         if (!response.ok) {
             const errorText = await response.text();
+            throw new Error(`Ошибка авторизации GigaChat: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        gigaAccessToken = data.access_token;
+        tokenExpiresAt = data.expires_at;  // в миллисекундах
+        return gigaAccessToken;
+    }
+    
+    // Проверка и обновление токена
+    async function ensureToken() {
+        if (!gigaAccessToken || (tokenExpiresAt && Date.now() + 60000 > tokenExpiresAt)) {
+            await getGigaToken();
+        }
+        return gigaAccessToken;
+    }
+    
+    // Запрос к GigaChat API
+    async function askGigaChat(query) {
+        const token = await ensureToken();
+        
+        const requestBody = {
+            model: "GigaChat",  // или "GigaChat-Pro", "GigaChat-Plus" [citation:2][citation:8]
+            messages: [
+                { role: "user", content: query }
+            ],
+            temperature: 0.7,
+            max_tokens: 2000
+        };
+        
+        const response = await fetch(GIGACHAT_API_URL, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestBody)
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            if (response.status === 401) {
+                // Токен просрочен — обновляем и пробуем ещё раз
+                await getGigaToken();
+                return askGigaChat(query);
+            }
             throw new Error(`Ошибка ${response.status}: ${errorText.slice(0, 150)}`);
         }
         
@@ -323,7 +371,7 @@
         dynamicDiv.innerHTML = `
             <div class="login-box">
                 <button class="yandex-btn" id="loginBtn">🔑 Войти через Яндекс ID</button>
-                <p style="color: #a0e0a8; margin-top: 24px;">Авторизуйтесь, чтобы общаться с WR AI. Это сделано ради вашей безопасности.</p>
+                <p style="color: #a0e0a8; margin-top: 24px;">Авторизуйтесь, чтобы общаться с WR AI на GigaChat</p>
             </div>
         `;
         document.getElementById('loginBtn')?.addEventListener('click', startLogin);
@@ -337,7 +385,7 @@
                     <button class="send-action" id="sendBtn">✨ Отправить</button>
                 </div>
                 <div class="response-block">
-                    <div class="resp-title">🌱 WR AI отвечает</div>
+                    <div class="resp-title">🌱 WR AI отвечает (GigaChat)</div>
                     <div class="resp-content" id="answer">✨ Здесь будет ответ...</div>
                 </div>
             </div>
@@ -355,15 +403,15 @@
             answerDiv.innerHTML = `<div class="loader"><div class="spinner"></div> WR AI думает...</div>`;
             
             try {
-                const reply = await askDeepSeek(query);
+                const reply = await askGigaChat(query);
                 answerDiv.innerHTML = escapeHtml(reply);
                 input.value = '';
             } catch (err) {
                 let errorMsg = err.message;
-                if (errorMsg.includes('402')) {
-                    errorMsg = 'Не хватает баланса DeepSeek. Зарегистрируйте новый аккаунт — дают $5 бонуса.';
-                } else if (errorMsg.includes('401')) {
-                    errorMsg = 'Неверный API-ключ DeepSeek. Проверьте и вставьте заново.';
+                if (errorMsg.includes('401') || errorMsg.includes('403')) {
+                    errorMsg = 'Ошибка авторизации GigaChat. Проверьте API-ключ.';
+                } else if (errorMsg.includes('429')) {
+                    errorMsg = 'Превышен лимит запросов. Попробуйте через минуту.';
                 }
                 answerDiv.innerHTML = `<span style="color:#ffb59e;">⚠️ ${escapeHtml(errorMsg)}</span>`;
             } finally {
@@ -403,6 +451,7 @@
         return str.replace(/[&<>]/g, (m) => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;');
     }
     
+    // Запуск
     checkYandexAuth();
     updateUI();
 </script>
