@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WR AI</title>
+    <title>WR AI — Zhipu AI</title>
     <style>
         * {
             margin: 0;
@@ -68,6 +68,7 @@
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            letter-spacing: -1px;
         }
 
         .badge {
@@ -238,38 +239,38 @@
     <div class="header">
         <div>
             <span class="logo">WR AI</span>
-            <span class="badge">✦ ВЕРСИЯ 8.01 ✦</span>
+            <span class="badge">✦ ВЕРСИЯ 9.13 ✦</span>
         </div>
         <div id="userWidget"></div>
     </div>
     <div id="dynamicContent"></div>
-    <footer>🌿 Молниеносная магия WR AI на Cerebras</footer>
+    <footer>🌿 переливающаяся магия WR AI</footer>
 </div>
 
 <script>
-    // ========== ВАШИ ДАННЫЕ (уже вставлены) ==========
-    const CEREBRAS_API_KEY = "csk-jt2cc2td838dp8cp3e8meckncx2jymmpy522c3w3k6cx4mkw";
+    // ========== ВАШИ ДАННЫЕ ==========
+    const ZHIPU_API_KEY = "7a2fb4ce6849484ab304fdc32d698532.xxTQZKvCXHdIePuV";
     const YANDEX_CLIENT_ID = "b8f23d01e8594c39b7deac22c9f67b84";
-    // =================================================
+    // =================================
     
     const REDIRECT_URI = window.location.origin + window.location.pathname;
-    const CEREBRAS_URL = "https://api.cerebras.ai/v1/chat/completions";
+    const ZHIPU_URL = "https://api.z.ai/api/paas/v4/chat/completions";
     
     let loggedUser = null;
     
     const userWidget = document.getElementById('userWidget');
     const dynamicDiv = document.getElementById('dynamicContent');
     
-    // Запрос к Cerebras (молниеносно быстро!)
-    async function askCerebras(query) {
-        const response = await fetch(CEREBRAS_URL, {
+    // Запрос к Zhipu AI
+    async function askZhipu(query) {
+        const response = await fetch(ZHIPU_URL, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${CEREBRAS_API_KEY}`,
+                "Authorization": `Bearer ${ZHIPU_API_KEY}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                model: "llama3.1-8b",  // Быстрая и качественная модель
+                model: "glm-4",
                 messages: [{ role: "user", content: query }],
                 temperature: 0.7,
                 max_tokens: 2000
@@ -278,10 +279,9 @@
         
         if (!response.ok) {
             const errorText = await response.text();
-            // Если превысили лимит (Cerebras даёт около 30 запросов/мин)
             if (response.status === 429) {
                 await new Promise(resolve => setTimeout(resolve, 3000));
-                return askCerebras(query);
+                return askZhipu(query);
             }
             throw new Error(`Ошибка ${response.status}: ${errorText.slice(0, 150)}`);
         }
@@ -326,7 +326,7 @@
         dynamicDiv.innerHTML = `
             <div class="login-box">
                 <button class="yandex-btn" id="loginBtn">🔑 Войти через Яндекс ID</button>
-                <p style="color: #a0e0a8; margin-top: 24px;">Авторизуйтесь, чтобы общаться с WR AI. Это сделано ради вашей безопасности.</p>
+                <p style="color: #a0e0a8; margin-top: 24px;">Авторизуйтесь, чтобы общаться с WR AI. Это сделано для вашей безопасности.</p>
             </div>
         `;
         document.getElementById('loginBtn')?.addEventListener('click', startLogin);
@@ -340,7 +340,7 @@
                     <button class="send-action" id="sendBtn">✨ Отправить</button>
                 </div>
                 <div class="response-block">
-                    <div class="resp-title">🌱 WR AI отвечает (Cerebras — очень быстро)</div>
+                    <div class="resp-title">🌱 WR AI отвечает</div>
                     <div class="resp-content" id="answer">✨ Здесь будет ответ...</div>
                 </div>
             </div>
@@ -355,18 +355,18 @@
             if (!query) return;
             
             btn.disabled = true;
-            answerDiv.innerHTML = `<div class="loader"><div class="spinner"></div> WR AI обрабатывает запрос на сверхскорости...</div>`;
+            answerDiv.innerHTML = `<div class="loader"><div class="spinner"></div> WR AI думает...</div>`;
             
             try {
-                const reply = await askCerebras(query);
+                const reply = await askZhipu(query);
                 answerDiv.innerHTML = escapeHtml(reply);
                 input.value = '';
             } catch (err) {
                 let errorMsg = err.message;
                 if (errorMsg.includes('401')) {
-                    errorMsg = 'Неверный API-ключ Cerebras. Проверьте ключ на cloud.cerebras.ai';
+                    errorMsg = 'Ошибка ключа API. Проверьте ключ Zhipu.';
                 } else if (errorMsg.includes('429')) {
-                    errorMsg = 'Слишком много запросов. Подождите пару секунд...';
+                    errorMsg = 'Превышен лимит запросов. Попробуйте позже.';
                 } else if (errorMsg.includes('fetch')) {
                     errorMsg = 'Ошибка соединения. Проверьте интернет.';
                 }
